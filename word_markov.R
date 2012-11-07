@@ -8,23 +8,25 @@ text <- readChar(fileName, file.info(fileName)$size)
 text <- gsub("\r|\n","",text)
 text <- gsub("\"","'",text)
 #set markov order into variable:look_forward and set length of final text
-look_forward <- 2
+look_forward <- 4
 final_length <- 100 - look_forward - 1
 
-#set up matrix to be used in for loop into matrix:d
+#set up matrix to be used in word assignnment for loop into matrix:d
 split_text <- as.data.frame(strsplit(text," "))
 word_count <- nrow(split_text)
 d <- matrix(nrow=1, ncol=word_count)
 
 #split up word combinations into matrix:d
-#from stackoverflow: http://stackoverflow.com/questions/8872376/split-vector-with-overlapping-samples-in-r
+#function from stackoverflow: http://stackoverflow.com/questions/8872376/split-vector-with-overlapping-samples-in-r to split up vector with overlap
 splitWithOverlap <- function(vec, seg.length, overlap) {
   starts = seq(1, length(vec), by=seg.length-overlap)
   ends   = starts + seg.length - 1
   ends[ends > length(vec)] = length(vec)
   lapply(1:length(starts), function(i, vec, starts, ends) vec[starts[i]:ends[i]], vec, starts, ends)
 }
+#put overlapping subvectors into each column of d
 d <- sapply(split_text, function(x){ splitWithOverlap(as.character(x),(look_forward+1),look_forward)})
+#paste each overlapping subvector together into character strings
 d <- sapply(d, function(x){ paste(x, collapse=" ") })
 
 
@@ -43,9 +45,12 @@ word_table$probability <- word_table$frequency / total_words
 
 #add columns to word_table with last word of word combinations and then first words
 word_table$split_words <- strsplit(as.character(word_table$words)," ")
+#put placeholders into last_word and first_words columns of word_table
 word_table$last_word <- NA_character_
 word_table$first_words <- NA_character_
+#get only the last word of each substring and put into last_word column
 word_table$last_word <- as.character(sapply(word_table$split_words, function(x){ x[look_forward+1] } ))
+#get all but the last word of each substring and put into first_words column, pasted into character vector
 word_table$first_words <- as.character(sapply(word_table$split_words, function(x){ paste(x[-(look_forward+1)], collapse=" ") } ))
 
 #set seed words
