@@ -2,14 +2,16 @@
 setwd("~/R/Resources")
 
 #set text to be used and read into variable:text
-fileName <- "prideandprejudice_10ch.txt"
-text <- readChar(fileName, file.info(fileName)$size)
+fileName_1 <- "blank.txt"
+fileName_2 <- "bible_20ch.txt"
+fileName_3 <- "aliceinwonderland.txt"
+text <- paste(readChar(fileName_1, file.info(fileName_1)$size), gsub("\\d", "", readChar(fileName_2, file.info(fileName_2)$size)), readChar(fileName_3, file.info(fileName_3)$size), sep=" ")
 #get rid of line break characters and slashes and escaped quotation marks
 text <- gsub("\r|\n","",text)
 text <- gsub("\"","'",text)
 #set markov order into variable:look_forward and set length of final text
-look_forward <- 4
-final_length <- 100 - look_forward - 1
+look_forward <- 2
+final_length <- 300 - look_forward - 1
 
 #set up matrix to be used in word assignnment for loop into matrix:d
 split_text <- as.data.frame(strsplit(text," "))
